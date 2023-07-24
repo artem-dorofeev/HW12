@@ -122,8 +122,7 @@ def search_in_adb(args):
     elif len(temp_result) == 1:
         return f"{temp_result[0]}"
     else:
-        for i in temp_result:
-            result += i + "\n"
+       result = "\n".join(temp_result)
     return result
 
 
