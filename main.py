@@ -1,7 +1,27 @@
 ﻿from classes_bot import AddressBook, Name, Phone, Record, Birthday, BirthdayError, NameError, PhoneError
 from datetime import datetime
+import pickle
 
 address_book = AddressBook()
+
+
+def file_error(func):
+    def wrapper():
+        try:
+            result = func()
+        except FileNotFoundError:
+            address_book = AddressBook()
+            return f"Немає доступу до файла, створена нова адресна книга"
+        return result
+    return wrapper
+
+
+@file_error
+def load_adb_from_file():
+    global address_book
+    with open("adr_book.bin", "rb") as f:
+        address_book = pickle.load(f)
+    return f"Адресна книга загружена з файлу"
 
 
 def input_error(func):
@@ -56,7 +76,7 @@ def phone_print(*data):
     contact = data[0].capitalize().strip()
     result = address_book[contact]
     days_for_bd = days_to_bd(*data)
-    return f"Контакт: {result} до дня народження {days_for_bd}"
+    return f"Контакт: {result} до дня народження {days_for_bd} днів"
 
 
 @index_error
@@ -131,6 +151,13 @@ def search_in_adb(args):
     return result
 
 
+def write_adb_to_file():
+    file_name = "adr_book.bin"
+    with open(file_name, "wb") as f:
+        pickle.dump(address_book, f)
+    return f"Дані збережено до файлу {file_name}"
+
+
 COMMANDS = {
     add_command: ("add", "+", "додати"),
     change_command: ("change", "зміни"),
@@ -140,7 +167,8 @@ COMMANDS = {
     phone_print: ("phone", "друк", "print"),
     get_birth: ("birthday", "birth"),
     days_to_bd: ("days", "днюха"),
-    search_in_adb: ("search", "пошук")
+    search_in_adb: ("search", "пошук"),
+    write_adb_to_file: ("backup", "резервування", "копія")
 }
 
 
@@ -154,11 +182,18 @@ def parser(text: str):
 
 
 def main():
+
+    load_adb = load_adb_from_file()
+    print(load_adb)
+
     while True:
         user_input = input(">>чекаю ввод>>")
         cmd, data = parser(user_input)
         result = cmd(*data)
         print(result)
+        if cmd == add_command or cmd == change_command or cmd == get_birth:
+            backup = write_adb_to_file()
+            print(backup)
         if cmd == exit_command:
             break
 

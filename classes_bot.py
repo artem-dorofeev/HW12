@@ -2,6 +2,7 @@ from collections import UserDict
 from datetime import datetime
 
 
+
 class Field:
     def __init__(self, value) -> None:
         self.value = value
@@ -55,7 +56,6 @@ class Phone(Field):
         if len(new_phone) < 7 or len(new_phone) > 12:
             raise PhoneError("Невірний формат номера")
         self.__value = new_phone
-
 
 
 class BirthdayError(Exception):
