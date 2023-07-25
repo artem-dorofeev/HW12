@@ -1,5 +1,4 @@
-﻿from classes_bot import AddressBook, Name, Phone, Record, Birthday, BirthdayError, NameError
-from sanitize import sanitize_phone_number
+﻿from classes_bot import AddressBook, Name, Phone, Record, Birthday, BirthdayError, NameError, PhoneError
 from datetime import datetime
 
 address_book = AddressBook()
@@ -41,9 +40,10 @@ def add_command(*args):
         name = Name(args[0])
     except NameError as e:
         return e
-    if len(args[1]) > 13 or len(args[1]) < 10:
-        return f"Невірний формат номер телефона"
-    phone = Phone(sanitize_phone_number(args[1]))
+    try:
+        phone = Phone(args[1])
+    except PhoneError as f:
+        return f
     rec: Record = address_book.get(str(name))
     if rec:
         return rec.add_phone(phone)
@@ -62,10 +62,14 @@ def phone_print(*data):
 @index_error
 def change_command(*args):
     name = Name(args[0].capitalize())
-    old_phone = Phone(sanitize_phone_number(args[1]))
-    if len(args[2]) > 13 or len(args[2]) < 10:
-        return f"Невірний формат номер телефона"
-    new_phone = Phone(sanitize_phone_number(args[2]))
+    try:
+        old_phone = Phone(args[1])
+    except PhoneError as f:
+        return f
+    try:
+        new_phone = Phone(args[2])
+    except PhoneError as f:
+        return f
     rec: Record = address_book.get(str(name))
     if rec:
         return rec.change_phone(old_phone, new_phone)
@@ -110,6 +114,7 @@ def days_to_bd(*args):
         return rec.days_for_birthday()
     return f"Немає {name} в списку контактів"
 
+
 def search_in_adb(args):
     temp_result = []
     result = ''
@@ -122,7 +127,7 @@ def search_in_adb(args):
     elif len(temp_result) == 1:
         return f"{temp_result[0]}"
     else:
-       result = "\n".join(temp_result)
+        result = "\n".join(temp_result)
     return result
 
 
