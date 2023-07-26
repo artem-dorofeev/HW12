@@ -1,6 +1,6 @@
 from collections import UserDict
 from datetime import datetime
-
+import pickle
 
 
 class Field:
@@ -126,7 +126,36 @@ class Record:
 class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[str(record.name)] = record
+        AddressBook.write_adb_to_file(self.data)
         return f"Контакт {record} додано успішно"
+
+    def write_adb_to_file(self):
+        file_name = "adr_book.bin"
+        with open(file_name, "wb") as f:
+            pickle.dump(self, f)
+        # print(f"Дані збережено до файлу {file_name}")
+        return f"Дані збережено до файлу {file_name}"
+
+    def load_adb_from_file(self):
+        with open("adr_book.bin", "rb") as f:
+            self.data = pickle.load(f)
+        # print("Адресна книга загружена з файлу")
+        return f"Адресна книга загружена з файлу"
+
+    def search_cont(self, args):
+        temp_result = []
+        result = ''
+        search = str(args)
+        for key, val in self.data.items():
+            if search in str(key.lower()) or search in str(val):
+                temp_result.append(str(val))
+        if len(temp_result) < 1:
+            return f"{args} не знайдено"
+        elif len(temp_result) == 1:
+            return f"{temp_result[0]}"
+        else:
+            result = "\n".join(temp_result)
+        return result
 
     def iterator(self, n=3):
         result = ''

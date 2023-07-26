@@ -16,12 +16,18 @@ def file_error(func):
     return wrapper
 
 
+# @file_error
+# def load_adb_from_file():
+#     global address_book
+#     with open("adr_book.bin", "rb") as f:
+#         address_book = pickle.load(f)
+#     return f"Адресна книга загружена з файлу"
+
 @file_error
 def load_adb_from_file():
-    global address_book
-    with open("adr_book.bin", "rb") as f:
-        address_book = pickle.load(f)
-    return f"Адресна книга загружена з файлу"
+    # global address_book
+    AddressBook.load_adb_from_file(address_book)
+    return f"load OK"
 
 
 def input_error(func):
@@ -135,27 +141,32 @@ def days_to_bd(*args):
     return f"Немає {name} в списку контактів"
 
 
+# def search_in_adb(args):
+#     temp_result = []
+#     result = ''
+#     search = str(args)
+#     for key, val in address_book.items():
+#         if search in str(key.lower()) or search in str(val):
+#             temp_result.append(str(val))
+#     if len(temp_result) < 1:
+#         return f"{args} не знайдено"
+#     elif len(temp_result) == 1:
+#         return f"{temp_result[0]}"
+#     else:
+#         result = "\n".join(temp_result)
+#     return result
+
 def search_in_adb(args):
-    temp_result = []
-    result = ''
-    search = str(args)
-    for key, val in address_book.items():
-        if search in str(key.lower()) or search in str(val):
-            temp_result.append(str(val))
-    if len(temp_result) < 1:
-        return f"{args} не знайдено"
-    elif len(temp_result) == 1:
-        return f"{temp_result[0]}"
-    else:
-        result = "\n".join(temp_result)
+    result = AddressBook.search_cont(address_book, args)
     return result
 
 
 def write_adb_to_file():
-    file_name = "adr_book.bin"
-    with open(file_name, "wb") as f:
-        pickle.dump(address_book, f)
-    return f"Дані збережено до файлу {file_name}"
+    # file_name = "adr_book.bin"
+    result = AddressBook.write_adb_to_file(address_book)
+    # with open(file_name, "wb") as f:
+    #     pickle.dump(address_book, f)
+    return result
 
 
 COMMANDS = {
@@ -192,7 +203,7 @@ def main():
         result = cmd(*data)
         print(result)
         if cmd == add_command or cmd == change_command or cmd == get_birth:
-            backup = write_adb_to_file()
+            backup = AddressBook.write_adb_to_file(address_book)
             print(backup)
         if cmd == exit_command:
             break
