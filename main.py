@@ -45,7 +45,7 @@ def index_error(func):
         try:
             result = func(*args)
         except IndexError:
-            return f"Немає імені або номеру контакта"
+            return f"Немає імені або номеру або дати народження контакта"
         return result
     return wrapper
 
@@ -121,6 +121,7 @@ def show_all_command(*args):
     return f"адресна книга надрукована"
 
 
+@index_error
 def get_birth(*args):
     name = Name(args[0].capitalize())
     rec = address_book.get(str(name))
