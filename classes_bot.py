@@ -117,7 +117,21 @@ class Record:
             next_birth = datetime(current_date.year + 1,
                                   birth.month, birth.day)
         day_for_birth = next_birth - current_date
-        return day_for_birth.days
+        return day_for_birth.days + 1
+
+    def list_birthday(self, days):
+        if self.birthday:
+
+            birth = self.birthday.value
+            current_date = datetime.now()
+            next_birth = datetime(current_date.year, birth.month, birth.day)
+            if next_birth < current_date:
+                next_birth = datetime(current_date.year + 1,
+                                      birth.month, birth.day)
+            day_for_birth = next_birth - current_date
+            if (int(day_for_birth.days)+1) < days:
+                return day_for_birth.days + 1
+        return None
 
     def __str__(self) -> str:
         return f"{self.name}: {', '.join(str(p) for p in self.phones)}"

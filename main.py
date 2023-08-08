@@ -62,6 +62,7 @@ def key_error(func):
 
 @input_error
 def add_command(*args):
+    print(args)
     try:
         name = Name(args[0])
     except NameError as e:
@@ -123,6 +124,7 @@ def show_all_command(*args):
 
 @index_error
 def get_birth(*args):
+    print(args)
     name = Name(args[0].capitalize())
     rec = address_book.get(str(name))
     if rec:
@@ -135,11 +137,25 @@ def get_birth(*args):
 
 
 def days_to_bd(*args):
+    print(args)
     name = Name(args[0].capitalize())
     rec = address_book.get(str(name))
     if rec:
         return rec.days_for_birthday()
     return f"Немає {name} в списку контактів"
+
+
+def list_cont_birth(*args):
+    # print(args[0])
+    day = int(args[0])
+    list_bd = ''
+    for key, value in address_book.items():
+        rec = address_book.get(str(key))
+        if rec.list_birthday(day):
+            # print(key, rec.list_birthday(day))
+            days_for_birthday = rec.list_birthday(day)
+            list_bd += f'{key}: {days_for_birthday} \n'
+    return list_bd.strip()
 
 
 # def search_in_adb(args):
@@ -180,7 +196,8 @@ COMMANDS = {
     get_birth: ("birthday", "birth"),
     days_to_bd: ("days", "днюха"),
     search_in_adb: ("search", "пошук"),
-    write_adb_to_file: ("backup", "резервування", "копія")
+    write_adb_to_file: ("backup", "резервування", "копія"),
+    list_cont_birth: ("listbd",)
 }
 
 
@@ -201,6 +218,7 @@ def main():
     while True:
         user_input = input(">>чекаю ввод>>")
         cmd, data = parser(user_input)
+        # print('218', cmd, data)
         result = cmd(*data)
         print(result)
         if cmd == add_command or cmd == change_command or cmd == get_birth:
